@@ -32,7 +32,7 @@ func RegisterTables(tables map[string]interface{}) {
   registeredTables = make(map[string]string)
   for tableName, object := range tables {
     log.Println("Table registered: ", tableName)
-    db.DbMap().AddTableWithName(object, tableName)
+    db.DbMap().AddTableWithName(object, tableName).SetKeys(true, "Id")
     registeredTables[reflect.TypeOf(object).Name()] = tableName
   }
   db.DbMap().CreateTablesIfNotExists()

@@ -1,10 +1,10 @@
 package model
 
 import (
-  "github.com/dalmirdasilva/way/persistence"
   "github.com/coopernurse/gorp"
-  "errors"
+  "github.com/dalmirdasilva/gorecord/persistence"
   "log"
+  "reflect"
 )
 
 type fn func(* gorp.DbMap) (interface{}, error)
@@ -13,19 +13,19 @@ type Entry struct {
   Id int64
   Created int64
   Updated int64
+  Self interface{} `db:"-"`
 }
+
+
 
 func (e *Entry) Save() error  {
   _, err := run(func(db *gorp.DbMap) (interface{}, error) {
     var err error = nil
     var rows int64 = 0
-    log.Println(e.Id)
-    return nil, nil
     if e.Id == 0 {
-      log.Println("Iserting.")
-      err = db.Insert(e)
+      err = db.Insert(e.Self)
     } else {
-      rows, err = db.Update()
+      rows, err = db.Update(e.Self)
     }
     return rows, err
   })
@@ -44,8 +44,9 @@ func (e *Entry) Delete() error  {
   return err
 }
 
-func (e *Entry) Find(id int64) (*Entry, error)  {
-  var result Entry
+func (e Entry) Find(id int64) (*Entry, error)  {
+  log.Println("find with: ", reflect.TypeOf(e))
+  /*var result Entry
   var ok bool
   found, err := run(func(db *gorp.DbMap) (interface{}, error) {
     var entry Entry
@@ -60,6 +61,8 @@ func (e *Entry) Find(id int64) (*Entry, error)  {
     }
   }
   return &result, err
+  */
+  return nil, nil
 }
 
 func run(f fn) (interface{}, error) {
